@@ -60,6 +60,7 @@ class CountryListItem extends StatelessWidget {
           const SizedBox(width: 10),
           Flexible(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Tooltip(
                   message: country.name,
@@ -67,6 +68,23 @@ class CountryListItem extends StatelessWidget {
                   child: Text(
                     country.name,
                     overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 93, 236, 112),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    country.region,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],

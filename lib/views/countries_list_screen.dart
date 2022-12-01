@@ -130,25 +130,27 @@ class SearchField extends StatelessWidget {
     required this.countryController,
     required this.countryNotifier,
     required this.fullList,
-  });
+  }) : super(key: key);
 
   final TextEditingController countryController;
   final ValueNotifier<List<Country>> countryNotifier;
   final List<Country> fullList;
+
+  filterSearch(String country) {
+    countryNotifier.value = fullList
+        .where((element) => element.name.toLowerCase().contains(country))
+        .toList();
+  }
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: countryController,
       onChanged: ((value) {
-        countryNotifier.value = fullList
-            .where((element) => element.name.toLowerCase().contains(value))
-            .toList();
+        filterSearch(value);
       }),
       onSubmitted: ((value) {
-        countryNotifier.value = fullList
-            .where((element) => element.name.toLowerCase().contains(value))
-            .toList();
+        filterSearch(value);
       }),
       decoration: InputDecoration(
           isCollapsed: true,
@@ -170,7 +172,10 @@ class SearchField extends StatelessWidget {
               backgroundColor: const Color(0xffF76C6C),
               child: IconButton(
                 splashRadius: 0.5,
-                onPressed: () {},
+                onPressed: () {
+                  filterSearch(countryController.text.trim());
+                  FocusScope.of(context).unfocus();
+                },
                 icon: const Icon(
                   Icons.search_rounded,
                   color: Colors.white,
