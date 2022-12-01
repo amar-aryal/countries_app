@@ -23,6 +23,7 @@ class _CountriesListScreenState extends ConsumerState<CountriesListScreen> {
   late ScrollController _controller;
   late TextEditingController _countryController;
   late ValueNotifier<List<Country>> _countryNotifier;
+  late ValueNotifier<String> _selectedRegionNotifier;
 
   @override
   void initState() {
@@ -30,6 +31,7 @@ class _CountriesListScreenState extends ConsumerState<CountriesListScreen> {
     _controller = ScrollController();
     _countryController = TextEditingController();
     _countryNotifier = ValueNotifier([]);
+    _selectedRegionNotifier = ValueNotifier('All');
 
     // _controller.addListener(() {
     //   if (_controller.offset >=
@@ -45,6 +47,7 @@ class _CountriesListScreenState extends ConsumerState<CountriesListScreen> {
     _controller.dispose();
     _countryController.dispose();
     _countryNotifier.dispose();
+    _selectedRegionNotifier.dispose();
     super.dispose();
   }
 
@@ -74,9 +77,19 @@ class _CountriesListScreenState extends ConsumerState<CountriesListScreen> {
               },
               data: (data) {
                 // to prevent resetting to original list after keyboard opens/closes and triggers rebuild
-                if (_countryController.text.trim().isEmpty) {
-                  _countryNotifier.value = [...data.value];
+                if (_selectedRegionNotifier.value == 'All') {
+                  if (_countryController.text.trim().isEmpty) {
+                    _countryNotifier.value = [...data.value];
+                  }
+                } else {
+                  if (_countryController.text.trim().isEmpty) {
+                    _countryNotifier.value = [
+                      ...data.value.where((element) =>
+                          element.region == _selectedRegionNotifier.value)
+                    ];
+                  }
                 }
+
                 return CustomScrollView(
                   controller: _controller,
                   slivers: [
@@ -92,9 +105,67 @@ class _CountriesListScreenState extends ConsumerState<CountriesListScreen> {
                           SearchField(
                             countryController: _countryController,
                             countryNotifier: _countryNotifier,
+                            selectedRegion: _selectedRegionNotifier.value,
                             fullList: data.value,
                           ),
                         ],
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: ValueListenableBuilder(
+                          valueListenable: _selectedRegionNotifier,
+                          builder: (_, String value, __) {
+                            return Row(
+                              children: [
+                                ...[
+                                  'All',
+                                  'Africa',
+                                  'Americas',
+                                  'Asia',
+                                  'Europe',
+                                  'Oceania'
+                                ].map(
+                                  (e) => InkWell(
+                                    onTap: () {
+                                      _selectedRegionNotifier.value = e;
+                                      if (e == 'All') {
+                                        _countryNotifier.value = [
+                                          ...data.value
+                                        ];
+                                        return;
+                                      }
+                                      _countryNotifier.value = data.value
+                                          .where(
+                                              (element) => element.region == e)
+                                          .toList();
+                                    },
+                                    child: Container(
+                                      margin: const EdgeInsets.all(8),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 8, horizontal: 14),
+                                      decoration: BoxDecoration(
+                                        color: e == value
+                                            ? const Color(0xff24305E)
+                                            : Colors.grey.shade400,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Text(
+                                        e,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            );
+                          },
+                        ),
                       ),
                     ),
                     ValueListenableBuilder(
@@ -130,16 +201,26 @@ class SearchField extends StatelessWidget {
     required this.countryController,
     required this.countryNotifier,
     required this.fullList,
+    required this.selectedRegion,
   }) : super(key: key);
 
   final TextEditingController countryController;
   final ValueNotifier<List<Country>> countryNotifier;
+  final String selectedRegion;
   final List<Country> fullList;
 
   filterSearch(String country) {
-    countryNotifier.value = fullList
-        .where((element) => element.name.toLowerCase().contains(country))
-        .toList();
+    if (selectedRegion == 'All') {
+      countryNotifier.value = fullList
+          .where((element) => element.name.toLowerCase().contains(country))
+          .toList();
+    } else {
+      countryNotifier.value = fullList
+          .where((element) =>
+              element.name.toLowerCase().contains(country) &&
+              element.region == selectedRegion)
+          .toList();
+    }
   }
 
   @override
