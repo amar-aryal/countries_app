@@ -19,7 +19,7 @@ class Country with _$Country {
     @Default('') String capital,
     @Default([]) List<String> altSpellings,
     required String region,
-    required String continent,
+    required String subregion,
     @Default(0) int population,
     @Default([]) List<num> latlng,
     @Default('') String demonym,

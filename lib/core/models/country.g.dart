@@ -24,7 +24,7 @@ _$_Country _$$_CountryFromJson(Map<String, dynamic> json) => _$_Country(
               .toList() ??
           const [],
       region: json['region'] as String,
-      continent: json['continent'] as String,
+      subregion: json['subregion'] as String,
       population: json['population'] as int? ?? 0,
       latlng:
           (json['latlng'] as List<dynamic>?)?.map((e) => e as num).toList() ??
@@ -74,7 +74,7 @@ Map<String, dynamic> _$$_CountryToJson(_$_Country instance) =>
       'capital': instance.capital,
       'altSpellings': instance.altSpellings,
       'region': instance.region,
-      'continent': instance.continent,
+      'subregion': instance.subregion,
       'population': instance.population,
       'latlng': instance.latlng,
       'demonym': instance.demonym,

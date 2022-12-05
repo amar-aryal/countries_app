@@ -28,7 +28,7 @@ mixin _$Country {
   String get capital => throw _privateConstructorUsedError;
   List<String> get altSpellings => throw _privateConstructorUsedError;
   String get region => throw _privateConstructorUsedError;
-  String get continent => throw _privateConstructorUsedError;
+  String get subregion => throw _privateConstructorUsedError;
   int get population => throw _privateConstructorUsedError;
   List<num> get latlng => throw _privateConstructorUsedError;
   String get demonym => throw _privateConstructorUsedError;
@@ -65,7 +65,7 @@ abstract class $CountryCopyWith<$Res> {
       String capital,
       List<String> altSpellings,
       String region,
-      String continent,
+      String subregion,
       int population,
       List<num> latlng,
       String demonym,
@@ -108,7 +108,7 @@ class _$CountryCopyWithImpl<$Res, $Val extends Country>
     Object? capital = null,
     Object? altSpellings = null,
     Object? region = null,
-    Object? continent = null,
+    Object? subregion = null,
     Object? population = null,
     Object? latlng = null,
     Object? demonym = null,
@@ -159,9 +159,9 @@ class _$CountryCopyWithImpl<$Res, $Val extends Country>
           ? _value.region
           : region // ignore: cast_nullable_to_non_nullable
               as String,
-      continent: null == continent
-          ? _value.continent
-          : continent // ignore: cast_nullable_to_non_nullable
+      subregion: null == subregion
+          ? _value.subregion
+          : subregion // ignore: cast_nullable_to_non_nullable
               as String,
       population: null == population
           ? _value.population
@@ -271,7 +271,7 @@ abstract class _$$_CountryCopyWith<$Res> implements $CountryCopyWith<$Res> {
       String capital,
       List<String> altSpellings,
       String region,
-      String continent,
+      String subregion,
       int population,
       List<num> latlng,
       String demonym,
@@ -313,7 +313,7 @@ class __$$_CountryCopyWithImpl<$Res>
     Object? capital = null,
     Object? altSpellings = null,
     Object? region = null,
-    Object? continent = null,
+    Object? subregion = null,
     Object? population = null,
     Object? latlng = null,
     Object? demonym = null,
@@ -364,9 +364,9 @@ class __$$_CountryCopyWithImpl<$Res>
           ? _value.region
           : region // ignore: cast_nullable_to_non_nullable
               as String,
-      continent: null == continent
-          ? _value.continent
-          : continent // ignore: cast_nullable_to_non_nullable
+      subregion: null == subregion
+          ? _value.subregion
+          : subregion // ignore: cast_nullable_to_non_nullable
               as String,
       population: null == population
           ? _value.population
@@ -448,7 +448,7 @@ class _$_Country implements _Country {
       this.capital = '',
       final List<String> altSpellings = const [],
       required this.region,
-      required this.continent,
+      required this.subregion,
       this.population = 0,
       final List<num> latlng = const [],
       this.demonym = '',
@@ -516,7 +516,7 @@ class _$_Country implements _Country {
   @override
   final String region;
   @override
-  final String continent;
+  final String subregion;
   @override
   @JsonKey()
   final int population;
@@ -595,7 +595,7 @@ class _$_Country implements _Country {
 
   @override
   String toString() {
-    return 'Country(name: $name, topLevelDomain: $topLevelDomain, alpha2Code: $alpha2Code, alpha3Code: $alpha3Code, callingCodes: $callingCodes, capital: $capital, altSpellings: $altSpellings, region: $region, continent: $continent, population: $population, latlng: $latlng, demonym: $demonym, area: $area, gini: $gini, timezones: $timezones, borders: $borders, nativeName: $nativeName, numericCode: $numericCode, currencies: $currencies, languages: $languages, translations: $translations, flags: $flags, regionalBlocs: $regionalBlocs, cioc: $cioc, independent: $independent)';
+    return 'Country(name: $name, topLevelDomain: $topLevelDomain, alpha2Code: $alpha2Code, alpha3Code: $alpha3Code, callingCodes: $callingCodes, capital: $capital, altSpellings: $altSpellings, region: $region, subregion: $subregion, population: $population, latlng: $latlng, demonym: $demonym, area: $area, gini: $gini, timezones: $timezones, borders: $borders, nativeName: $nativeName, numericCode: $numericCode, currencies: $currencies, languages: $languages, translations: $translations, flags: $flags, regionalBlocs: $regionalBlocs, cioc: $cioc, independent: $independent)';
   }
 
   @override
@@ -616,8 +616,8 @@ class _$_Country implements _Country {
             const DeepCollectionEquality()
                 .equals(other._altSpellings, _altSpellings) &&
             (identical(other.region, region) || other.region == region) &&
-            (identical(other.continent, continent) ||
-                other.continent == continent) &&
+            (identical(other.subregion, subregion) ||
+                other.subregion == subregion) &&
             (identical(other.population, population) ||
                 other.population == population) &&
             const DeepCollectionEquality().equals(other._latlng, _latlng) &&
@@ -657,7 +657,7 @@ class _$_Country implements _Country {
         capital,
         const DeepCollectionEquality().hash(_altSpellings),
         region,
-        continent,
+        subregion,
         population,
         const DeepCollectionEquality().hash(_latlng),
         demonym,
@@ -700,7 +700,7 @@ abstract class _Country implements Country {
       final String capital,
       final List<String> altSpellings,
       required final String region,
-      required final String continent,
+      required final String subregion,
       final int population,
       final List<num> latlng,
       final String demonym,
@@ -737,7 +737,7 @@ abstract class _Country implements Country {
   @override
   String get region;
   @override
-  String get continent;
+  String get subregion;
   @override
   int get population;
   @override

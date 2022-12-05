@@ -71,21 +71,55 @@ class CountryListItem extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 93, 236, 112),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    country.region,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 4, horizontal: 8),
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(255, 93, 236, 112)
+                            .withOpacity(0.78),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Tooltip(
+                        message: country.region,
+                        preferBelow: false,
+                        child: Text(
+                          country.region,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 5),
+                    Flexible(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 4, horizontal: 8),
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(255, 93, 172, 236)
+                              .withOpacity(0.78),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Tooltip(
+                          message: country.subregion,
+                          preferBelow: false,
+                          child: Text(
+                            country.subregion,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:know_my_country/core/models/country.dart';
 import 'package:know_my_country/core/services/networking/network_helper.dart';
+import 'package:know_my_country/views/country_detail_screen.dart';
 import 'package:know_my_country/views/widgets/error_view.dart';
 
 import 'widgets/country_list_item.dart';
@@ -51,6 +52,24 @@ class _CountriesListScreenState extends ConsumerState<CountriesListScreen> {
     super.dispose();
   }
 
+  regionFilter(String region, List<Country> fullList) {
+    Scrollable.ensureVisible(
+      GlobalObjectKey(region).currentContext!,
+      duration: const Duration(
+        milliseconds: 500,
+      ),
+      alignment: .5,
+      curve: Curves.easeIn,
+    );
+    _selectedRegionNotifier.value = region;
+    if (region == 'All') {
+      _countryNotifier.value = [...fullList];
+      return;
+    }
+    _countryNotifier.value =
+        fullList.where((element) => element.region == region).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final countries = ref.watch(countriesProvider);
@@ -77,6 +96,7 @@ class _CountriesListScreenState extends ConsumerState<CountriesListScreen> {
               },
               data: (data) {
                 // to prevent resetting to original list after keyboard opens/closes and triggers rebuild
+                // TODO: code working but still review this
                 if (_selectedRegionNotifier.value == 'All') {
                   if (_countryController.text.trim().isEmpty) {
                     _countryNotifier.value = [...data.value];
@@ -84,8 +104,13 @@ class _CountriesListScreenState extends ConsumerState<CountriesListScreen> {
                 } else {
                   if (_countryController.text.trim().isEmpty) {
                     _countryNotifier.value = [
-                      ...data.value.where((element) =>
-                          element.region == _selectedRegionNotifier.value)
+                      ...data.value.where(
+                        (element) =>
+                            element.region == _selectedRegionNotifier.value &&
+                            element.name
+                                .toLowerCase()
+                                .contains(_countryController.text),
+                      ),
                     ];
                   }
                 }
@@ -129,19 +154,12 @@ class _CountriesListScreenState extends ConsumerState<CountriesListScreen> {
                                 ].map(
                                   (e) => InkWell(
                                     onTap: () {
-                                      _selectedRegionNotifier.value = e;
-                                      if (e == 'All') {
-                                        _countryNotifier.value = [
-                                          ...data.value
-                                        ];
-                                        return;
+                                      if (_selectedRegionNotifier.value != e) {
+                                        regionFilter(e, data.value);
                                       }
-                                      _countryNotifier.value = data.value
-                                          .where(
-                                              (element) => element.region == e)
-                                          .toList();
                                     },
                                     child: Container(
+                                      key: GlobalObjectKey(e),
                                       margin: const EdgeInsets.all(8),
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 8, horizontal: 14),
@@ -195,6 +213,21 @@ class _CountriesListScreenState extends ConsumerState<CountriesListScreen> {
   }
 }
 
+class Continent {
+  const Continent({
+    required this.name,
+    required this.size,
+  });
+
+  final String name;
+  final int size;
+
+  @override
+  String toString() {
+    return '$name ($size)';
+  }
+}
+
 class SearchField extends StatelessWidget {
   const SearchField({
     Key? key,
@@ -225,45 +258,103 @@ class SearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: countryController,
-      onChanged: ((value) {
-        filterSearch(value);
-      }),
-      onSubmitted: ((value) {
-        filterSearch(value);
-      }),
-      decoration: InputDecoration(
-          isCollapsed: true,
-          contentPadding: const EdgeInsets.all(10),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(25.0),
-            borderSide: const BorderSide(
-              width: 0,
-              style: BorderStyle.none,
-            ),
-          ),
-          filled: true,
-          hintStyle: const TextStyle(color: Colors.black26),
-          hintText: "Search countries",
-          fillColor: Colors.white,
-          suffixIcon: Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: CircleAvatar(
-              backgroundColor: const Color(0xffF76C6C),
-              child: IconButton(
-                splashRadius: 0.5,
-                onPressed: () {
-                  filterSearch(countryController.text.trim());
-                  FocusScope.of(context).unfocus();
+    final size = MediaQuery.of(context).size;
+
+    return Autocomplete<Country>(
+      optionsViewBuilder: (BuildContext context,
+          AutocompleteOnSelected<Country> onSelected,
+          Iterable<Country> countries) {
+        return Align(
+          alignment: Alignment.topLeft,
+          child: Material(
+            child: SizedBox(
+              width: size.width / 1.5,
+              child: ListView.builder(
+                padding: const EdgeInsets.all(10.0),
+                itemCount: countries.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final Country option = countries.elementAt(index);
+
+                  return GestureDetector(
+                    onTap: () {
+                      onSelected(option);
+                    },
+                    child: ListTile(
+                      title: Text(
+                        option.name,
+                      ),
+                    ),
+                  );
                 },
-                icon: const Icon(
-                  Icons.search_rounded,
-                  color: Colors.white,
-                ),
               ),
             ),
-          )),
+          ),
+        );
+      },
+      onSelected: ((option) {
+        FocusScope.of(context).unfocus();
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => CountryDetailScreen(
+                    country: option,
+                  )),
+        );
+      }),
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        if (textEditingValue.text.isEmpty) {
+          return const Iterable.empty();
+        }
+        return fullList
+            .where((country) => country.name
+                .toLowerCase()
+                .startsWith(textEditingValue.text.toLowerCase()))
+            .toList();
+      },
+      displayStringForOption: (Country option) => option.name,
+      fieldViewBuilder:
+          ((context, textEditingController, focusNode, onFieldSubmitted) {
+        return TextField(
+          controller: textEditingController,
+          // onChanged: ((value) {}),
+          focusNode: focusNode,
+          // onSubmitted: ((value) {
+          //   filterSearch(value);
+          // }),
+          decoration: InputDecoration(
+              isCollapsed: true,
+              contentPadding: const EdgeInsets.all(10),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(25.0),
+                borderSide: const BorderSide(
+                  width: 0,
+                  style: BorderStyle.none,
+                ),
+              ),
+              filled: true,
+              hintStyle: const TextStyle(color: Colors.black26),
+              hintText: "Search countries",
+              fillColor: Colors.white,
+              suffixIcon: Padding(
+                padding: const EdgeInsets.all(2.0),
+                child: CircleAvatar(
+                  backgroundColor: const Color(0xffF76C6C),
+                  child: IconButton(
+                    splashRadius: 0.5,
+                    onPressed: () {
+                      filterSearch(countryController.text.trim());
+                      FocusScope.of(context).unfocus();
+                    },
+                    icon: const Icon(
+                      Icons.search_rounded,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              )),
+        );
+      }),
     );
   }
 }
